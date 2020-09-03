@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Bird : MonoBehaviour
@@ -9,6 +7,7 @@ public class Bird : MonoBehaviour
     private bool _birdWasLaunched;
     private float _timeSittingAround = 0;
     [SerializeField] private int _launchPower = 180;
+    [SerializeField] private float _gravity = (float)0.5;
 
     public void birdInitPos (Vector2 value) {
         _initialPosition = value;
@@ -21,7 +20,7 @@ public class Bird : MonoBehaviour
         GetComponent<LineRenderer>().SetPosition(0, transform.position);
         GetComponent<LineRenderer>().SetPosition(1, _initialPosition);
 
-        // if bird was launched and move very slowly, reset
+        // if bird was launched and move very slowly
         if (_birdWasLaunched && GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
             _timeSittingAround += Time.deltaTime;
         }
@@ -33,7 +32,15 @@ public class Bird : MonoBehaviour
         {
             string currentSceneName = SceneManager.GetActiveScene().name;
             SceneManager.LoadScene(currentSceneName);
+
+            // turn off SFX
+            FindObjectOfType<AudioManager>().Stop("BirdFly");
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other) {
+        // turn off SFX
+            FindObjectOfType<AudioManager>().Stop("BirdFly");
     }
 
     private void OnMouseDown() {
@@ -42,11 +49,16 @@ public class Bird : MonoBehaviour
 
         // show LineRenderer
         GetComponent<LineRenderer>().enabled = true;
+
+        // play SFX
+        FindObjectOfType<AudioManager>().Play("RubberStretch");
     }
     
-    private float angle, radius = (float)1.5;
+    private float angle;
+    [SerializeField] private float radius = (float)0.5;
 
     private void OnMouseDrag() {
+        ////////////
         Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         // direction of the target
@@ -94,12 +106,18 @@ public class Bird : MonoBehaviour
         GetComponent<Rigidbody2D>().AddForce(directionToInitialPosition * _launchPower);
 
         // set gravity back to 1
-        GetComponent<Rigidbody2D>().gravityScale = 1;
+        GetComponent<Rigidbody2D>().gravityScale = _gravity;
 
         // hide LineRenderer
         GetComponent<LineRenderer>().enabled = false;
 
         //
         _birdWasLaunched = true;
+
+        // turn off SFX
+        FindObjectOfType<AudioManager>().Stop("RubberStretch");
+
+        // play SFX
+        FindObjectOfType<AudioManager>().Play("BirdFly");
     }
 }
