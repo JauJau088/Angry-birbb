@@ -9,8 +9,8 @@ public class Bird : MonoBehaviour
     [SerializeField] private int launchPower = 2300;
     [SerializeField] private float gravity = (float)0.14;
 
-    public void birdInitPos (Vector2 value) {
-        initialPosition = value;
+    private void Awake() {
+        initialPosition =  GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
 
         transform.position = initialPosition;
     }
@@ -30,16 +30,6 @@ public class Bird : MonoBehaviour
             transform.position.y > 15 || transform.position.y < -15 ||
             timeSittingAround > 3)
         {
-            /* !!!!!!!!!!!
-            // These are some solid codes for other GameObjects' component handling
-            // Change GlobalVar related values later with this
-            
-            GlobalVar init = GameObject.FindObjectOfType<GlobalVar>();
-            Debug.Log(init.birdInitPos);
-            transform.position = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
-            */            
-
-            // reset values
             transform.position = initialPosition;
             transform.rotation = Quaternion.identity;
             birdWasLaunched = false;

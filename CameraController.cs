@@ -11,19 +11,13 @@ public class CameraController : MonoBehaviour
     private float minX, maxX, minY, maxY;
     private Vector2 camToPos, birdInit, pointInit;
 
-    public void birdInitPos (Vector2 value) {
-        birdInit = value;
-    }
-
-    public void pointInitPos (Vector2 value) {
-        pointInit = value;
-    }
-
     private void Awake() {
         // init
         birb = GameObject.Find("GreenB");
         aPoint = GameObject.Find("aPoint");
         boundary = GameObject.Find("boundary");
+        birdInit =  GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
+        pointInit =  GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
     }
 
     private void Start() {
