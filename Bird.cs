@@ -30,10 +30,14 @@ public class Bird : MonoBehaviour
             transform.position.y > 15 || transform.position.y < -15 ||
             timeSittingAround > 3)
         {
+            /* !!!!!!!!!!!
+            // These are some solid codes for other GameObjects' component handling
+            // Change GlobalVar related values later with this
+            
             GlobalVar init = GameObject.FindObjectOfType<GlobalVar>();
             Debug.Log(init.birdInitPos);
             transform.position = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
-            
+            */            
 
             // reset values
             transform.position = initialPosition;
