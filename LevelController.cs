@@ -28,7 +28,14 @@ public class LevelController : MonoBehaviour
         if (waitTime > 2) {
             _nextLevelIndex++;
             string nextLevelName = "Level" + _nextLevelIndex;
-            SceneManager.LoadScene(nextLevelName);
+
+            if (Application.CanStreamedLevelBeLoaded(nextLevelName)) {
+                SceneManager.LoadScene(nextLevelName);
+            }
+            else {
+                string currentSceneName = SceneManager.GetActiveScene().name;
+                SceneManager.LoadScene(currentSceneName);
+            }
         }
     }
 }
