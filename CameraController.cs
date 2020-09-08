@@ -2,9 +2,7 @@
 
 public class CameraController : MonoBehaviour
 {
-    GameObject birb;
-    GameObject aPoint;
-    GameObject boundary;
+    GameObject birb, aPoint, boundary;
 
     private float leftLim, rightLim, bottomLim, topLim;
     private float leftCam, rightCam, bottomCam, topCam;
@@ -16,8 +14,8 @@ public class CameraController : MonoBehaviour
         birb = GameObject.Find("GreenB");
         aPoint = GameObject.Find("aPoint");
         boundary = GameObject.Find("boundary");
-        birdInit =  GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
-        pointInit =  GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
+        birdInit = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
+        pointInit = GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
     }
 
     private void Start() {
