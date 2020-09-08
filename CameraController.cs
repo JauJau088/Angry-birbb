@@ -2,11 +2,8 @@
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField]
     GameObject birb;
-    [SerializeField]
     GameObject aPoint;
-    [SerializeField]
     GameObject boundary;
 
     private float leftLim, rightLim, bottomLim, topLim;
@@ -20,6 +17,13 @@ public class CameraController : MonoBehaviour
 
     public void pointInitPos (Vector2 value) {
         pointInit = value;
+    }
+
+    private void Awake() {
+        // init
+        birb = GameObject.Find("GreenB");
+        aPoint = GameObject.Find("aPoint");
+        boundary = GameObject.Find("boundary");
     }
 
     private void Start() {
