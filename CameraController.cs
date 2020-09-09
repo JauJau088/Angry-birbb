@@ -5,52 +5,41 @@ public class CameraController : MonoBehaviour
     GameObject birb, aPoint, boundary;
 
     private float leftLim, rightLim, bottomLim, topLim;
-    private float leftCam, rightCam, bottomCam, topCam;
+    private float leftCam, rightCam, bottomCam, topCam, camHeight, camWidth;
     private float minX, maxX, minY, maxY;
-    private Vector2 camToPos, birdInit, pointInit;
+    private Vector2 camInit;
 
     private void Awake() {
         // init
         birb = GameObject.Find("GreenB");
         aPoint = GameObject.Find("aPoint");
         boundary = GameObject.Find("boundary");
-        birdInit = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
-        pointInit = GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
+        camInit = GameObject.FindObjectOfType<GlobalVar>().camInitPos;
     }
 
     private void Start() {
-        //
-        float initCenterX = birdInit.x + (pointInit.x - birdInit.x) / 2;
-        float initCenterY = birdInit.y + (pointInit.y - birdInit.y) / 2;
+        // Cam height and width in WorldPoint
+        // orthographicSize * 2 = full height of the cam in WorldPoint
+        camHeight = Camera.main.orthographicSize * 2;
+        camWidth = camHeight * Screen.width / Screen.height;
 
-        //
-        camToPos.y = Camera.main.orthographicSize * 2;
-        camToPos.x = camToPos.y * Screen.width / Screen.height;
+        // Camera boundaries
+        leftCam = camInit.x - camWidth / 2;
+        rightCam = camInit.x + camWidth / 2;
+        bottomCam = camInit.y - camHeight / 2;
+        topCam = camInit.y + camHeight / 2;
 
-        // cam
-        //Vector3 camToPos = Camera.main.ScreenToWorldPoint(new Vector3 ((float)Screen.width, (float)Screen.height));
-
-        leftCam = initCenterX - camToPos.x / 2;
-        rightCam = initCenterX + camToPos.x / 2;
-        bottomCam = initCenterY - camToPos.y / 2;
-        topCam = initCenterY + camToPos.y / 2;
-
-        // background boundary position
+        // Reference boundaries
         leftLim = boundary.GetComponent<Renderer>().bounds.min.x;
         rightLim = boundary.GetComponent<Renderer>().bounds.max.x;
         bottomLim = boundary.GetComponent<Renderer>().bounds.min.y;
         topLim = boundary.GetComponent<Renderer>().bounds.max.y;
 
-        Debug.Log("bottomLim = " + bottomLim);
-        Debug.Log("Screen.width = " + Screen.width);
-        Debug.Log("camToPos.x = " + camToPos.x);
-        Debug.Log("y Ortho = " + camToPos.y);
-
-        //
-        minX = initCenterX + (leftLim - leftCam);
-        maxX = initCenterX + (rightLim - rightCam);
-        minY = initCenterY + (bottomLim - bottomCam);
-        maxY = initCenterY + (topLim - topCam);
+        // Min and max x and y coordinate in which camera may move to
+        minX = camInit.x + (leftLim - leftCam);
+        maxX = camInit.x + (rightLim - rightCam);
+        minY = camInit.y + (bottomLim - bottomCam);
+        maxY = camInit.y + (topLim - topCam);
     }
 
     private void FixedUpdate() {
@@ -73,12 +62,7 @@ public class CameraController : MonoBehaviour
     }
 
     private void OnDrawGizmos() {
-        //Vector3 camToPos = Camera.main.ScreenToWorldPoint();
-
         Gizmos.color = Color.red;
-
-        //Debug.Log("Screen width = " + (float)Screen.width);
-        //Debug.Log("posToCam.x = " + posToCam.x);
 
         Gizmos.DrawLine(new Vector2(minX, maxY), new Vector2(maxX, maxY));
         Gizmos.DrawLine(new Vector2(maxX, maxY), new Vector2(maxX, minY));

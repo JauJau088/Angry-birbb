@@ -12,7 +12,7 @@ public class LevelController : MonoBehaviour
 
     private float waitTime = 0;
 
-    void Update() {
+    private void Update() {
         // loop until no enemy left
         foreach (Enemy enemy in _enemies) {
             if (enemy != null)

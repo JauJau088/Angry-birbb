@@ -2,7 +2,7 @@
 
 public class Bird : MonoBehaviour
 {
-    [HideInInspector] public Vector3 initialPosition;
+    private Vector3 initialPosition;
     private bool birdWasLaunched;
     private float timeSittingAround = 0;
     [SerializeField] private int launchPower = 2300;
