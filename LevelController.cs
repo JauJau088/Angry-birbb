@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class LevelController : MonoBehaviour
 {
     private Enemy[] _enemies;
-    private static int _nextLevelIndex = 1;
+    private static int nextLevelIndex = 1;
 
     private void OnEnable() {
         _enemies = FindObjectsOfType<Enemy>();
@@ -12,7 +12,7 @@ public class LevelController : MonoBehaviour
 
     private float waitTime = 0;
 
-    void Update() {
+    private void Update() {
         // loop until no enemy left
         foreach (Enemy enemy in _enemies) {
             if (enemy != null)
@@ -21,20 +21,19 @@ public class LevelController : MonoBehaviour
 
         // if no enemy is left, wait
         Debug.Log("You killed all enemies");
-
         waitTime += Time.deltaTime;
 
         // then go to the next level
-        if (waitTime > 2) {
-            _nextLevelIndex++;
-            string nextLevelName = "Level" + _nextLevelIndex;
+        if (waitTime > 3) {
+            nextLevelIndex++;
+            string nextLevelName = "Level" + nextLevelIndex;
 
             if (Application.CanStreamedLevelBeLoaded(nextLevelName)) {
                 SceneManager.LoadScene(nextLevelName);
             }
             else {
-                string currentSceneName = SceneManager.GetActiveScene().name;
-                SceneManager.LoadScene(currentSceneName);
+                SceneManager.LoadScene("Level1");
+                nextLevelIndex = 1;
             }
         }
     }

@@ -2,11 +2,11 @@
 
 public class Apoint : MonoBehaviour
 {
-    private Vector2 _initialPosition;
+    private Vector2 initialPosition;
 
-    public void pointInitPos (Vector2 value) {
-        _initialPosition = value;
+    private void Awake() {
+        initialPosition =  GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
 
-        transform.position = _initialPosition;
+        transform.position = initialPosition;
     }
 }

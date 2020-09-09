@@ -2,31 +2,13 @@
 
 public class GlobalVar : MonoBehaviour
 {
-    // other scripts
-    private Apoint aPoint;
-    private Bird bird;
-    private CameraController cameraController;
-    private Enemy enemy;
-    private LevelController levelController;
-
     // global variables
-    public Vector2 pointInitPos;
-    public Vector2 birdInitPos;
+    public Vector2 pointInitPos, birdInitPos;
+    // do not serialize this
+    public Vector2 camInitPos;
 
     private void Awake() {
-        // initialize
-        aPoint = GameObject.FindObjectOfType<Apoint>();
-        bird = GameObject.FindObjectOfType<Bird>();
-        cameraController = GameObject.FindObjectOfType<CameraController>();
-        enemy = GameObject.FindObjectOfType<Enemy>();
-        levelController = GameObject.FindObjectOfType<LevelController>();
-
-        // pass the values to the other scripts
-        aPoint.pointInitPos(pointInitPos);
-        
-        bird.birdInitPos(birdInitPos);
-        
-        cameraController.pointInitPos(pointInitPos);
-        cameraController.birdInitPos(birdInitPos);
+        camInitPos.x = birdInitPos.x + (pointInitPos.x - birdInitPos.x) / 2;
+        camInitPos.y = birdInitPos.y + (pointInitPos.y - birdInitPos.y) / 2;
     }
 }
