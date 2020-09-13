@@ -3,8 +3,8 @@
 public class Bird : MonoBehaviour
 {
     private Vector3 initialPosition;
-    private bool birdWasLaunched;
-    private float timeSittingAround = 0;
+    private bool birdWasLaunched, doThisOnce = true;
+    private float timeSittingAround = 0, timeAfterLaunched = 0;
     [SerializeField] private int launchPower = 2300;
     [SerializeField] private float gravity = (float)0.14;
 
@@ -18,6 +18,17 @@ public class Bird : MonoBehaviour
         // line renderer
         GetComponent<LineRenderer>().SetPosition(0, transform.position);
         GetComponent<LineRenderer>().SetPosition(1, initialPosition);
+
+        // if bird was launched, play magic sprinkle music after few mili sec
+        if (birdWasLaunched && doThisOnce) {
+                timeAfterLaunched += Time.deltaTime;
+                if (timeAfterLaunched >= (float)0.25) {
+                    FindObjectOfType<AudioManager>().Play("MagicSprinkle");
+
+                    doThisOnce = false;
+                    timeAfterLaunched = 0;
+                }
+            }
 
         // if bird was launched and move very slowly, start timer
         if (birdWasLaunched && GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
@@ -42,7 +53,8 @@ public class Bird : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other) {
         // turn off SFX
-            FindObjectOfType<AudioManager>().Stop("BirdFly");
+        //FindObjectOfType<AudioManager>().Stop("BirdFly");
+        //FindObjectOfType<AudioManager>().Stop("MagicSprinkle");
     }
 
     private void OnMouseDown() {
@@ -62,6 +74,15 @@ public class Bird : MonoBehaviour
     [SerializeField] private float radius = (float)0.5;
 
     private void OnMouseDrag() {
+        /*// debug only
+            Vector3 n = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            // smoother first
+            Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
+            // move position
+            transform.position = smoothedPosition;
+        // debug only - end*/
+
+        
         if (birdWasLaunched == false) {
             ////////////
             Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -120,11 +141,13 @@ public class Bird : MonoBehaviour
 
             // bird launch trigger var
             birdWasLaunched = true;
+            doThisOnce = true;
 
             // turn off SFX
             FindObjectOfType<AudioManager>().Stop("RubberStretch");
 
             // play SFX
+            FindObjectOfType<AudioManager>().Play("RubberRelease");
             FindObjectOfType<AudioManager>().Play("BirdFly");
         }
     }

@@ -3,18 +3,22 @@ using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
-    private Enemy[] _enemies;
+    private Enemy[] enemies;
     private static int nextLevelIndex = 1;
 
-    private void OnEnable() {
-        _enemies = FindObjectsOfType<Enemy>();
-    }
+    private float waitTime = 0, start = 0, target = 56;
+    GameObject birb, aPoint;
 
-    private float waitTime = 0;
+    private void Awake() {
+        enemies = FindObjectsOfType<Enemy>();
+
+        birb = GameObject.Find("GreenB");
+        aPoint = GameObject.Find("aPoint");
+    }    
 
     private void Update() {
         // loop until no enemy left
-        foreach (Enemy enemy in _enemies) {
+        foreach (Enemy enemy in enemies) {
             if (enemy != null)
                 return;
         }
@@ -24,7 +28,7 @@ public class LevelController : MonoBehaviour
         waitTime += Time.deltaTime;
 
         // then go to the next level
-        if (waitTime > 3) {
+        /*if (waitTime > 3) {
             nextLevelIndex++;
             string nextLevelName = "Level" + nextLevelIndex;
 
@@ -35,6 +39,19 @@ public class LevelController : MonoBehaviour
                 SceneManager.LoadScene("Level1");
                 nextLevelIndex = 1;
             }
+        }*/
+
+        if (waitTime > 3) {
+            if (start < target) {
+                start = start + (float)0.5;
+
+                birb.GetComponent<Renderer>().enabled = false;
+            } else {
+                birb.GetComponent<Renderer>().enabled = true;
+            }
+
+            birb.transform.position = new Vector2(start, -2);
+            aPoint.transform.position = new Vector2(start, -2);
         }
     }
 }

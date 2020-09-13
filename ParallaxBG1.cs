@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 
-public class ParallaxFG : MonoBehaviour {
-    // The bigger the factor, the slower the movement, vice versa
-    // scaleFactor > 1 for BG
-    // 0 < scaleFactor < 1 for FG
-    private float scaleFactor = (float)5;
+public class ParallaxBG1 : MonoBehaviour {
+    // The bigger the factor, the slower the movement following the camera, vice versa
+    // scaleFactor >> for BG
+    // scaleFactor << for FG
+    private float scaleFactor;
     Vector2 initPos, deltaPos;
     Vector3 camInit;
 
     private void Awake() {
+        scaleFactor = GameObject.FindObjectOfType<GlobalVar>().parallaxBG1;
         initPos = transform.position;
         camInit = GameObject.FindObjectOfType<GlobalVar>().camInitPos;
         deltaPos = Camera.main.transform.position - camInit;
