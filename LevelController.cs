@@ -41,6 +41,7 @@ public class LevelController : MonoBehaviour
             }
         }*/
 
+        /*
         if (waitTime > 3) {
             if (start < target) {
                 start = start + (float)0.5;
@@ -52,6 +53,32 @@ public class LevelController : MonoBehaviour
 
             birb.transform.position = new Vector2(start, -2);
             aPoint.transform.position = new Vector2(start, -2);
+        }*/
+
+        if (waitTime > 3) {
+            // slower the cam
+            GameObject.FindObjectOfType<CameraController>().lerpFactor = 0.05f;
+
+            // change init pos in global var
+            GameObject.FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
+            GameObject.FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
+
+            // reset this script
+            Destroy(gameObject.GetComponent<Bird>());
+            gameObject.AddComponent<Bird>();
+            
+            // change gameobjects pos and hide them
+            // (the objects are different from the script, hence need to change them as well separately)
+            birb.GetComponent<Renderer>().enabled = false;
+            birb.transform.position = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
+            aPoint.transform.position = GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
+
+            // upon arrival to the new location
+            if (waitTime > 6) {
+                // return to original
+                GameObject.FindObjectOfType<CameraController>().lerpFactor = 0.125f;
+                birb.GetComponent<Renderer>().enabled = true;
+            }
         }
     }
 }

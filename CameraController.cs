@@ -9,6 +9,8 @@ public class CameraController : MonoBehaviour
     private float minX, maxX, minY, maxY;
     private Vector2 camInit;
 
+    public float lerpFactor = 0.125f;
+
     private void Awake() {
         // init
         birb = GameObject.Find("GreenB");
@@ -49,7 +51,7 @@ public class CameraController : MonoBehaviour
             transform.position.z
         );
 
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, 0.125f);
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, lerpFactor);
 
         transform.position = smoothedPosition;
         

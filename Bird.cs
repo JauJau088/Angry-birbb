@@ -2,8 +2,8 @@
 
 public class Bird : MonoBehaviour
 {
-    private Vector3 initialPosition;
-    private bool birdWasLaunched, doThisOnce = true;
+    public Vector3 initialPosition;
+    private bool birdWasLaunched, doThisOnce = true, doThisOnce2 = true, collided = false;
     private float timeSittingAround = 0, timeAfterLaunched = 0;
     [SerializeField] private int launchPower = 2300;
     [SerializeField] private float gravity = (float)0.14;
@@ -21,14 +21,27 @@ public class Bird : MonoBehaviour
 
         // if bird was launched, play magic sprinkle music after few mili sec
         if (birdWasLaunched && doThisOnce) {
-                timeAfterLaunched += Time.deltaTime;
-                if (timeAfterLaunched >= (float)0.25) {
-                    FindObjectOfType<AudioManager>().Play("MagicSprinkle");
+            timeAfterLaunched += Time.deltaTime;
+            if (timeAfterLaunched >= (float)0.3) {
+                FindObjectOfType<AudioManager>().Play("MagicSprinkle");
 
-                    doThisOnce = false;
-                    timeAfterLaunched = 0;
-                }
+                doThisOnce = false;
             }
+        }
+
+        if (birdWasLaunched && doThisOnce2) {
+            timeAfterLaunched += Time.deltaTime;
+            if (timeAfterLaunched >= (float)0.5) {
+                FindObjectOfType<AudioManager>().Play("BirdFly");
+
+                doThisOnce2 = false;
+                collided = false;
+            }
+        }
+
+        if (collided) {
+            timeAfterLaunched = 0;
+        }
 
         // if bird was launched and move very slowly, start timer
         if (birdWasLaunched && GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
@@ -47,14 +60,14 @@ public class Bird : MonoBehaviour
             GetComponent<Rigidbody2D>().gravityScale = 0;
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             GetComponent<Rigidbody2D>().angularVelocity = 0;
-            FindObjectOfType<AudioManager>().Stop("BirdFly");
         }
     }
 
     private void OnCollisionEnter2D(Collision2D other) {
+        // collision detected
+        collided = true;
+
         // turn off SFX
-        //FindObjectOfType<AudioManager>().Stop("BirdFly");
-        //FindObjectOfType<AudioManager>().Stop("MagicSprinkle");
     }
 
     private void OnMouseDown() {
@@ -74,15 +87,15 @@ public class Bird : MonoBehaviour
     [SerializeField] private float radius = (float)0.5;
 
     private void OnMouseDrag() {
-        /*// debug only
+        // debug start
             Vector3 n = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             // smoother first
             Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
             // move position
             transform.position = smoothedPosition;
-        // debug only - end*/
+        // debug end*/
 
-        
+        /*
         if (birdWasLaunched == false) {
             ////////////
             Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -121,7 +134,7 @@ public class Bird : MonoBehaviour
             Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
             // move position
             transform.position = smoothedPosition;
-        }
+        }*/
     }
 
     private void OnMouseUp() {
@@ -142,13 +155,26 @@ public class Bird : MonoBehaviour
             // bird launch trigger var
             birdWasLaunched = true;
             doThisOnce = true;
+            doThisOnce2 = true;
+            collided = false;
 
             // turn off SFX
             FindObjectOfType<AudioManager>().Stop("RubberStretch");
 
             // play SFX
             FindObjectOfType<AudioManager>().Play("RubberRelease");
-            FindObjectOfType<AudioManager>().Play("BirdFly");
+
+            /*
+            int rand = Random.Range(0,3);
+            Debug.Log(rand);
+            if (rand == 0) {
+                FindObjectOfType<AudioManager>().Play("BirdFly");
+            } else if (rand == 1) {
+                FindObjectOfType<AudioManager>().Play("BirdFly2");
+            } else {
+                FindObjectOfType<AudioManager>().Play("BirdFly3");
+            }
+            */
         }
     }
 }
