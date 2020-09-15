@@ -12,14 +12,16 @@ public class CameraController : MonoBehaviour
     public float lerpFactor = 0.125f;
 
     private void Awake() {
+        
+    }
+
+    private void Start() {
         // init
         birb = GameObject.Find("GreenB");
         aPoint = GameObject.Find("aPoint");
         boundary = GameObject.Find("boundary");
         camInit = GameObject.FindObjectOfType<GlobalVar>().camInitPos;
-    }
 
-    private void Start() {
         // Cam height and width in WorldPoint
         // orthographicSize * 2 = full height of the cam in WorldPoint
         camHeight = Camera.main.orthographicSize * 2;

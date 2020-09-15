@@ -3,81 +3,77 @@ using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
+    GameObject birdObj;
+    Bird birdScript;
     private Enemy[] enemies;
     private static int nextLevelIndex = 1;
-
     private float waitTime = 0, start = 0, target = 56;
-    GameObject birb, aPoint;
-
-    private void Awake() {
-        enemies = FindObjectsOfType<Enemy>();
-
-        birb = GameObject.Find("GreenB");
-        aPoint = GameObject.Find("aPoint");
-    }    
 
     private void Update() {
+        enemies = FindObjectsOfType<Enemy>();
+        birdObj = GameObject.Find("GreenB");
+        birdScript = birdObj.GetComponent<Bird>();
+
         // loop until no enemy left
         foreach (Enemy enemy in enemies) {
-            if (enemy != null)
+            if (enemy != null) {
+                // if bird was launched and move very slowly, start timer
+                if (birdScript.birdWasLaunched && birdObj.GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
+                    waitTime += Time.deltaTime;
+                }
+
+                // if out of screen or stay still few sec
+                if (birdObj.transform.position.x > 15 || birdObj.transform.position.x < -15 ||
+                    birdObj.transform.position.y > 15 || birdObj.transform.position.y < -15 ||
+                    waitTime > 3) {
+                    // then reset
+                    birdObj.transform.position = birdScript.initialPosition;
+                    birdObj.transform.rotation = Quaternion.identity;
+                    birdScript.birdWasLaunched = false;
+                    waitTime = 0;
+                    birdObj.GetComponent<Rigidbody2D>().gravityScale = 0;
+                    birdObj.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                    birdObj.GetComponent<Rigidbody2D>().angularVelocity = 0;
+                }
+
                 return;
+            }
         }
 
-        // if no enemy is left, wait
+        // if no enemy is left do all this
         Debug.Log("You killed all enemies");
         waitTime += Time.deltaTime;
 
-        // then go to the next level
-        /*if (waitTime > 3) {
+        if (waitTime > 3) {
+            // prepare for next level
             nextLevelIndex++;
             string nextLevelName = "Level" + nextLevelIndex;
 
+            // if next level is found
             if (Application.CanStreamedLevelBeLoaded(nextLevelName)) {
-                SceneManager.LoadScene(nextLevelName);
+                // slower the cam
+                FindObjectOfType<CameraController>().lerpFactor = 0.05f;
+
+                // directs cam to the next loc (TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+                // change init pos in global var
+                FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
+                FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
+                // end TO DO
+                
+                // wait for few more until cam reaches new pos then load next level
+                if (waitTime > 6) {
+                    //SceneManager.LoadScene("Main");
+                    SceneManager.LoadScene(nextLevelName, LoadSceneMode.Additive);
+                }
             }
+            // if not found, back to Level1
             else {
+                //    Debug.Log("init");
+                
+                //    Debug.Log("after loading Main");
                 SceneManager.LoadScene("Level1");
+                    Debug.Log("after loading Level1");
                 nextLevelIndex = 1;
-            }
-        }*/
-
-        /*
-        if (waitTime > 3) {
-            if (start < target) {
-                start = start + (float)0.5;
-
-                birb.GetComponent<Renderer>().enabled = false;
-            } else {
-                birb.GetComponent<Renderer>().enabled = true;
-            }
-
-            birb.transform.position = new Vector2(start, -2);
-            aPoint.transform.position = new Vector2(start, -2);
-        }*/
-
-        if (waitTime > 3) {
-            // slower the cam
-            GameObject.FindObjectOfType<CameraController>().lerpFactor = 0.05f;
-
-            // change init pos in global var
-            GameObject.FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
-            GameObject.FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
-
-            // reset this script
-            Destroy(gameObject.GetComponent<Bird>());
-            gameObject.AddComponent<Bird>();
-            
-            // change gameobjects pos and hide them
-            // (the objects are different from the script, hence need to change them as well separately)
-            birb.GetComponent<Renderer>().enabled = false;
-            birb.transform.position = GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
-            aPoint.transform.position = GameObject.FindObjectOfType<GlobalVar>().pointInitPos;
-
-            // upon arrival to the new location
-            if (waitTime > 6) {
-                // return to original
-                GameObject.FindObjectOfType<CameraController>().lerpFactor = 0.125f;
-                birb.GetComponent<Renderer>().enabled = true;
             }
         }
     }

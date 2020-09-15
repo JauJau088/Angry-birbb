@@ -3,13 +3,14 @@
 public class Bird : MonoBehaviour
 {
     public Vector3 initialPosition;
-    private bool birdWasLaunched, doThisOnce = true, doThisOnce2 = true, collided = false;
-    private float timeSittingAround = 0, timeAfterLaunched = 0;
+    public bool birdWasLaunched;
+    private bool doThisOnce = true, doThisOnce2 = true, collided = false;
+    private float timer = 0;
     [SerializeField] private int launchPower = 2300;
     [SerializeField] private float gravity = (float)0.14;
 
     private void Awake() {
-        initialPosition =  GameObject.FindObjectOfType<GlobalVar>().birdInitPos;
+        initialPosition =  FindObjectOfType<GlobalVar>().birdInitPos;
 
         transform.position = initialPosition;
     }
@@ -21,53 +22,36 @@ public class Bird : MonoBehaviour
 
         // if bird was launched, play magic sprinkle music after few mili sec
         if (birdWasLaunched && doThisOnce) {
-            timeAfterLaunched += Time.deltaTime;
-            if (timeAfterLaunched >= (float)0.3) {
+            timer += Time.deltaTime;
+            if (timer >= 0.3f) {
                 FindObjectOfType<AudioManager>().Play("MagicSprinkle");
 
                 doThisOnce = false;
+                timer = 0;
             }
         }
-
+        
+        // then play BirdFly
         if (birdWasLaunched && doThisOnce2) {
-            timeAfterLaunched += Time.deltaTime;
-            if (timeAfterLaunched >= (float)0.5) {
+            timer += Time.deltaTime;
+            if (timer >= 0.2f) {
                 FindObjectOfType<AudioManager>().Play("BirdFly");
 
                 doThisOnce2 = false;
-                collided = false;
+                timer = 0;
             }
         }
 
+        // reset timer when collided
         if (collided) {
-            timeAfterLaunched = 0;
-        }
-
-        // if bird was launched and move very slowly, start timer
-        if (birdWasLaunched && GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
-            timeSittingAround += Time.deltaTime;
-        }
-
-        // if out of screen or stay still few sec, reset
-        if (transform.position.x > 15 || transform.position.x < -15 ||
-            transform.position.y > 15 || transform.position.y < -15 ||
-            timeSittingAround > 3)
-        {
-            transform.position = initialPosition;
-            transform.rotation = Quaternion.identity;
-            birdWasLaunched = false;
-            timeSittingAround = 0;
-            GetComponent<Rigidbody2D>().gravityScale = 0;
-            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            GetComponent<Rigidbody2D>().angularVelocity = 0;
+            collided = false;
+            timer = 0;
         }
     }
 
     private void OnCollisionEnter2D(Collision2D other) {
         // collision detected
         collided = true;
-
-        // turn off SFX
     }
 
     private void OnMouseDown() {
@@ -93,8 +77,7 @@ public class Bird : MonoBehaviour
             Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
             // move position
             transform.position = smoothedPosition;
-        // debug end*/
-
+        // debug end
         /*
         if (birdWasLaunched == false) {
             ////////////
