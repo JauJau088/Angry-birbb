@@ -12,16 +12,14 @@ public class CameraController : MonoBehaviour
     public float lerpFactor = 0.125f;
 
     private void Awake() {
-        
-    }
-
-    private void Start() {
         // init
         birb = GameObject.Find("GreenB");
         aPoint = GameObject.Find("aPoint");
         boundary = GameObject.Find("boundary");
         camInit = GameObject.FindObjectOfType<GlobalVar>().camInitPos;
+    }
 
+    private void Start() {
         // Cam height and width in WorldPoint
         // orthographicSize * 2 = full height of the cam in WorldPoint
         camHeight = Camera.main.orthographicSize * 2;
@@ -47,6 +45,12 @@ public class CameraController : MonoBehaviour
     }
 
     private void FixedUpdate() {
+        // this is necessary to handle scene transition because the obj will be destroyed
+        if (birb == null) {
+            birb = GameObject.Find("GreenB");
+        }
+
+        // cam follow birb and smoothen its movement
         Vector3 desiredPosition = new Vector3 (
             birb.transform.position.x + (aPoint.transform.position.x - birb.transform.position.x) / 2,
             birb.transform.position.y + (aPoint.transform.position.y - birb.transform.position.y) / 2,
@@ -57,7 +61,7 @@ public class CameraController : MonoBehaviour
 
         transform.position = smoothedPosition;
         
-        //
+        // limit to where cam can move
         transform.position = new Vector3 (
             Mathf.Clamp(transform.position.x, minX, maxX),
             Mathf.Clamp(transform.position.y, minY, maxY),
@@ -65,6 +69,7 @@ public class CameraController : MonoBehaviour
         );
     }
 
+    // debugging: just a nice overview on the boundary 
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
 

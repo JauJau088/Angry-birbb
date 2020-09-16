@@ -10,6 +10,7 @@ public class Bird : MonoBehaviour
     [SerializeField] private float gravity = (float)0.14;
 
     private void Awake() {
+        // find gameobject ""
         initialPosition =  FindObjectOfType<GlobalVar>().birdInitPos;
 
         transform.position = initialPosition;

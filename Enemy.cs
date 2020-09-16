@@ -2,11 +2,11 @@
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private GameObject _cloudParticlePrefab;
+    [SerializeField] private GameObject cloudParticlePrefab;
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.collider.GetComponent<Bird>() != null) {
-            Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity);
+            Instantiate(cloudParticlePrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
 
@@ -17,7 +17,7 @@ public class Enemy : MonoBehaviour
 
         // if hit from the top (y < 0)
         if (collision.contacts[0].normal.y < 0) {
-            Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity);
+            Instantiate(cloudParticlePrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
 
@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour
         //
         // upside down
         if (Vector3.Dot(transform.up, Vector3.down) > 0) {
-            Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity);
+            Instantiate(cloudParticlePrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
