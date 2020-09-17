@@ -11,207 +11,136 @@ public class LevelController : MonoBehaviour
     private string levelName, tmpName;
     private float waitTime = 0, start = 0, target = 56;
 
-    bool a = false;
+    bool playTrigger = true, loadTrigger = false;
 
     private void Awake() {
         SceneManager.LoadScene("Level1");
     }
 
     private void Start() {
+        birdObj = GameObject.Find("GreenB");
+        birdScript = birdObj.GetComponent<Bird>();
         enemies = FindObjectsOfType<Enemy>();
-        Debug.Log("init enemies array = " + enemies);
     }
 
     private void Update() {
-        // current level
         levelName = "Level" + levelIndex;
+
+        // Level checker
         if (tmpName != levelName) {
             Debug.Log(levelName);
         }
         tmpName = levelName;
 
-        //StartCoroutine("Main");
+    //===================================================================||  PLAY STATE
+        if (playTrigger == true) {
+            // if bird was launched and move very slowly, start timer
+            if (birdScript.birdWasLaunched && birdObj.GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
+                waitTime += Time.deltaTime;
+            }
 
-        // if scene is not loaded yet, do nothing
-        if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
-            Debug.Log("scene not loaded yet");
+            // if out of screen or stay still few sec
+            if (birdObj.transform.position.x > 15 || birdObj.transform.position.x < -15 ||
+                birdObj.transform.position.y > 15 || birdObj.transform.position.y < -15 ||
+                waitTime > 3) {
+                // then reset
+                birdObj.transform.position = birdScript.initialPosition;
+                birdObj.transform.rotation = Quaternion.identity;
+                birdScript.birdWasLaunched = false;
+                waitTime = 0;
+                birdObj.GetComponent<Rigidbody2D>().gravityScale = 0;
+                birdObj.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                birdObj.GetComponent<Rigidbody2D>().angularVelocity = 0;
+            }
 
-            return;
+            foreach (Enemy enemy in enemies) {
+                if (enemy != null) {
+                    return;
+                }
+            }
+
+            // if this part is reached, then that means:
+            Debug.Log("You killed all enemies");
+
+            // trigger load function
+            loadTrigger = true;
         }
-        // otherwise do everything here
-        else {
-            if (birdObj == null) {
-                birdObj = GameObject.Find("GreenB");
-                birdScript = birdObj.GetComponent<Bird>();
-            }
+    //===================================================================||  END OF PLAY STATE
 
-            // if null, reload
-            Debug.Log("enemies array = " + enemies);
-            if (enemies == null) {
-                Debug.Log("enemies array = null");
-                enemies = FindObjectsOfType<Enemy>();
+    //===================================================================||  LOAD STATE
+        // load only once then reset the trigger back off
+        if (loadTrigger == true) {
+            StartCoroutine(Load());
 
-                return;
-            }
-            else {
-                // loop until no enemy is left
-                foreach (Enemy enemy in enemies) {
-                    Debug.Log("enemy = " + enemy);
-                    if (enemy != null) {
-                        // if bird was launched and move very slowly, start timer
-                        if (birdScript.birdWasLaunched && birdObj.GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
-                            waitTime += Time.deltaTime;
-                        }
-
-                        // if out of screen or stay still few sec
-                        if (birdObj.transform.position.x > 15 || birdObj.transform.position.x < -15 ||
-                            birdObj.transform.position.y > 15 || birdObj.transform.position.y < -15 ||
-                            waitTime > 3) {
-                            // then reset
-                            birdObj.transform.position = birdScript.initialPosition;
-                            birdObj.transform.rotation = Quaternion.identity;
-                            birdScript.birdWasLaunched = false;
-                            waitTime = 0;
-                            birdObj.GetComponent<Rigidbody2D>().gravityScale = 0;
-                            birdObj.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-                            birdObj.GetComponent<Rigidbody2D>().angularVelocity = 0;
-                        }
-                    } else {
-                        Debug.Log("enemy has become null");
-
-                        // if no enemy is left do all this
-                        Debug.Log("You killed all enemies");
-                        
-
-                        waitTime += Time.deltaTime;
-
-                        if (waitTime > 3) {
-                            // prepare for next level
-                            levelIndex++;
-                            levelName = "Level" + levelIndex;
-
-                            // if next level is found
-                            if (Application.CanStreamedLevelBeLoaded(levelName)) {
-                                // slower the cam
-                                FindObjectOfType<CameraController>().lerpFactor = 0.05f;
-
-                                // directs cam to the next loc (TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-                                // change init pos in global var
-                                FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
-                                FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
-                                // end TO DO
-                                
-                                // wait for few more until cam reaches new pos then load next level
-                                if (waitTime > 6) {
-                                    //SceneManager.LoadScene("Main");
-                                    SceneManager.LoadScene(levelName);
-                                }
-                            }
-                            // if not found, back to Level1
-                            else {
-                                //    Debug.Log("init");
-                                
-                                //    Debug.Log("after loading Main");
-                                SceneManager.LoadScene("Level1");
-                                    Debug.Log("after loading Level1");
-                                levelIndex = 1;
-                            }
-                        }
-                    }
-                }               
-            }
+            loadTrigger = false;
+            StartCoroutine(loadTriggerReset());
         }
+    //===================================================================||  END OF LOAD STATE
     }
 
-    IEnumerator Main() {
-        // if scene is not loaded yet, do nothing
-        if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
-            Debug.Log("scene not loaded yet");
+    IEnumerator Load() {
+        // prepare for next level
+        levelIndex++;
+        levelName = "Level" + levelIndex;
 
-            yield return null;
+        // if next level is found
+        if (Application.CanStreamedLevelBeLoaded(levelName)) {
+            Debug.Log("==================== New level can be loaded");
+
+            // slower the cam
+            FindObjectOfType<CameraController>().lerpFactor = 0.05f;
+
+            // directs cam to the next loc (TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+            // change init pos in global var
+            FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
+            FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
+            // end TO DO
+            
+            // wait for few more until cam reaches new pos then load next level
+            /*if (waitTime > 6) {
+                Debug.Log("==================== Init loading new Level");
+                if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
+                    SceneManager.LoadScene(levelName);
+                    Debug.Log("==================== Load new Level");
+                }
+            }*/
+
+            Debug.Log("==================== Init loading new Level");
+            if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
+                SceneManager.LoadScene(levelName);
+                Debug.Log("==================== Load new Level");
+            }
         }
-        // otherwise do everything here
+        // if not found, back to Level1
         else {
-            if (birdObj == null) {
-                birdObj = GameObject.Find("GreenB");
-                birdScript = birdObj.GetComponent<Bird>();
-            }
+            Debug.Log("==================== Init loading Level1");
 
-            // if null, reload
-            Debug.Log("enemies array = " + enemies);
-            if (enemies == null) {
-                Debug.Log("enemies array = null");
-                enemies = FindObjectsOfType<Enemy>();
-
-                yield return null;
-            }
-            else {
-                // loop until no enemy is left
-                foreach (Enemy enemy in enemies) {
-                    Debug.Log("enemy = " + enemy);
-                    if (enemy != null) {
-                        // if bird was launched and move very slowly, start timer
-                        if (birdScript.birdWasLaunched && birdObj.GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1) {
-                            waitTime += Time.deltaTime;
-                        }
-
-                        // if out of screen or stay still few sec
-                        if (birdObj.transform.position.x > 15 || birdObj.transform.position.x < -15 ||
-                            birdObj.transform.position.y > 15 || birdObj.transform.position.y < -15 ||
-                            waitTime > 3) {
-                            // then reset
-                            birdObj.transform.position = birdScript.initialPosition;
-                            birdObj.transform.rotation = Quaternion.identity;
-                            birdScript.birdWasLaunched = false;
-                            waitTime = 0;
-                            birdObj.GetComponent<Rigidbody2D>().gravityScale = 0;
-                            birdObj.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-                            birdObj.GetComponent<Rigidbody2D>().angularVelocity = 0;
-                        }
-                    } else {
-                        Debug.Log("enemy has become null");
-
-                        // if no enemy is left do all this
-                        Debug.Log("You killed all enemies");
-                        
-
-                        waitTime += Time.deltaTime;
-
-                        if (waitTime > 3) {
-                            // prepare for next level
-                            levelIndex++;
-                            levelName = "Level" + levelIndex;
-
-                            // if next level is found
-                            if (Application.CanStreamedLevelBeLoaded(levelName)) {
-                                // slower the cam
-                                FindObjectOfType<CameraController>().lerpFactor = 0.05f;
-
-                                // directs cam to the next loc (TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-                                // change init pos in global var
-                                FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
-                                FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
-                                // end TO DO
-                                
-                                // wait for few more until cam reaches new pos then load next level
-                                if (waitTime > 6) {
-                                    //SceneManager.LoadScene("Main");
-                                    SceneManager.LoadScene(levelName);
-                                }
-                            }
-                            // if not found, back to Level1
-                            else {
-                                //    Debug.Log("init");
-                                
-                                //    Debug.Log("after loading Main");
-                                SceneManager.LoadScene("Level1");
-                                    Debug.Log("after loading Level1");
-                                levelIndex = 1;
-                            }
-                        }
-                    }
-                }               
+            if (SceneManager.GetSceneByName("Level1").isLoaded == false) {
+                SceneManager.LoadScene("Level1");
+                Debug.Log("==================== Load Level1");
+                levelIndex = 1;
             }
         }
+
+        playTrigger = false;
+        Debug.Log("---------------------------- QUIT PLAY ----------------------------");
+
+        yield return new WaitForSeconds(3f);
+
+        // re-init
+        Debug.Log("---------------------------- re-init ----------------------------");
+
+        birdObj = GameObject.Find("GreenB");
+        birdScript = birdObj.GetComponent<Bird>();
+        enemies = FindObjectsOfType<Enemy>();
+        playTrigger = true;
+
+        Debug.Log("---------------------------- START PLAY ----------------------------");
+    }
+
+    IEnumerator loadTriggerReset() {
+        yield return new WaitForSeconds(5f);
+
+        loadTrigger = true;
     }
 }
