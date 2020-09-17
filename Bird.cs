@@ -2,7 +2,7 @@
 
 public class Bird : MonoBehaviour
 {
-    public Vector3 initialPosition;
+    public Vector3 initPos;
     public bool birdWasLaunched;
     private bool doThisOnce = true, doThisOnce2 = true, collided = false;
     private float timer = 0;
@@ -10,16 +10,13 @@ public class Bird : MonoBehaviour
     [SerializeField] private float gravity = (float)0.14;
 
     private void Awake() {
-        // find gameobject ""
-        initialPosition =  FindObjectOfType<GlobalVar>().birdInitPos;
-
-        transform.position = initialPosition;
+        initPos = transform.position;
     }
 
     private void Update() {
         // line renderer
         GetComponent<LineRenderer>().SetPosition(0, transform.position);
-        GetComponent<LineRenderer>().SetPosition(1, initialPosition);
+        GetComponent<LineRenderer>().SetPosition(1, initPos);
 
         // if bird was launched, play magic sprinkle music after few mili sec
         if (birdWasLaunched && doThisOnce) {
@@ -85,7 +82,7 @@ public class Bird : MonoBehaviour
             Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             // direction of the target
-            Vector2 direction = target - initialPosition;
+            Vector2 direction = target - initPos;
 
             // if target is above origin, then value = negative
             // so, top angles are between 0 and 180, bottom angles are between 0 and -180
@@ -100,8 +97,8 @@ public class Bird : MonoBehaviour
             Vector2 newPosition, n;
 
             // max boundaries
-            newPosition.x = initialPosition.x + radius * Mathf.Cos(angle * Mathf.Deg2Rad);
-            newPosition.y = initialPosition.y + radius * Mathf.Sin(angle * Mathf.Deg2Rad);
+            newPosition.x = initPos.x + radius * Mathf.Cos(angle * Mathf.Deg2Rad);
+            newPosition.y = initPos.y + radius * Mathf.Sin(angle * Mathf.Deg2Rad);
 
             // clamp x when outside of boundary
             if (direction.x > 0 )
@@ -127,8 +124,8 @@ public class Bird : MonoBehaviour
             GetComponent<SpriteRenderer>().color = Color.white;
 
             // move to the opposite direction with force multiplier = launchPower
-            Vector2 directionToInitialPosition = initialPosition - transform.position;
-            GetComponent<Rigidbody2D>().AddForce(directionToInitialPosition * launchPower);
+            Vector2 directionToInitPos = initPos - transform.position;
+            GetComponent<Rigidbody2D>().AddForce(directionToInitPos * launchPower);
 
             // set gravity
             GetComponent<Rigidbody2D>().gravityScale = gravity;

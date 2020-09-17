@@ -44,7 +44,7 @@ public class LevelController : MonoBehaviour
                 birdObj.transform.position.y > 15 || birdObj.transform.position.y < -15 ||
                 waitTime > 3) {
                 // then reset
-                birdObj.transform.position = birdScript.initialPosition;
+                birdObj.transform.position = birdScript.initPos;
                 birdObj.transform.rotation = Quaternion.identity;
                 birdScript.birdWasLaunched = false;
                 waitTime = 0;
@@ -79,33 +79,23 @@ public class LevelController : MonoBehaviour
     }
 
     IEnumerator Load() {
+        // stop the Play state
+        playTrigger = false;
+        Debug.Log("---------------------------- QUIT PLAY ----------------------------");
+
         // prepare for next level
         levelIndex++;
         levelName = "Level" + levelIndex;
 
+        // slower the cam
+        FindObjectOfType<CameraController>().lerpFactor = 0.05f;
+
         // if next level is found
         if (Application.CanStreamedLevelBeLoaded(levelName)) {
             Debug.Log("==================== New level can be loaded");
-
-            // slower the cam
-            FindObjectOfType<CameraController>().lerpFactor = 0.05f;
-
-            // directs cam to the next loc (TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-            // change init pos in global var
-            FindObjectOfType<GlobalVar>().birdInitPos = new Vector2(target, -2);
-            FindObjectOfType<GlobalVar>().pointInitPos = new Vector2(target, -2);
-            // end TO DO
-            
-            // wait for few more until cam reaches new pos then load next level
-            /*if (waitTime > 6) {
-                Debug.Log("==================== Init loading new Level");
-                if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
-                    SceneManager.LoadScene(levelName);
-                    Debug.Log("==================== Load new Level");
-                }
-            }*/
-
             Debug.Log("==================== Init loading new Level");
+
+            // load only once
             if (SceneManager.GetSceneByName(levelName).isLoaded == false) {
                 SceneManager.LoadScene(levelName);
                 Debug.Log("==================== Load new Level");
@@ -115,6 +105,7 @@ public class LevelController : MonoBehaviour
         else {
             Debug.Log("==================== Init loading Level1");
 
+            // load only once
             if (SceneManager.GetSceneByName("Level1").isLoaded == false) {
                 SceneManager.LoadScene("Level1");
                 Debug.Log("==================== Load Level1");
@@ -122,9 +113,7 @@ public class LevelController : MonoBehaviour
             }
         }
 
-        playTrigger = false;
-        Debug.Log("---------------------------- QUIT PLAY ----------------------------");
-
+        // after loading, wait for few sec
         yield return new WaitForSeconds(3f);
 
         // re-init
@@ -133,8 +122,9 @@ public class LevelController : MonoBehaviour
         birdObj = GameObject.Find("GreenB");
         birdScript = birdObj.GetComponent<Bird>();
         enemies = FindObjectsOfType<Enemy>();
-        playTrigger = true;
 
+        // start the Play state
+        playTrigger = true;
         Debug.Log("---------------------------- START PLAY ----------------------------");
     }
 
