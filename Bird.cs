@@ -3,7 +3,7 @@
 public class Bird : MonoBehaviour
 {
     public Vector3 initPos;
-    public bool birdWasLaunched;
+    public bool birdWasLaunched = false;
     private bool doThisOnce = true, doThisOnce2 = true, collided = false;
     private float timer = 0;
     [SerializeField] private int launchPower = 2300;

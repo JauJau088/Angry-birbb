@@ -2,9 +2,9 @@
 
 public class CameraController : MonoBehaviour
 {
-    GameObject boundary;
-    Bird bird;
-    Apoint aPoint;
+    private GameObject boundary;
+    private Bird bird;
+    private Apoint aPoint;
 
     private float leftLim, rightLim, bottomLim, topLim;
     private float leftCam, rightCam, bottomCam, topCam, camHeight, camWidth;
@@ -19,9 +19,6 @@ public class CameraController : MonoBehaviour
         boundary = GameObject.Find("boundary");
         bird = FindObjectOfType<Bird>();
         aPoint = FindObjectOfType<Apoint>();
-
-        Debug.Log("apint init pos = " + aPoint.transform.position);
-        Debug.Log("apint init pos init = " + aPoint.initPos);
 
         // cam init pos
         camInit.x = bird.initPos.x + (aPoint.initPos.x - bird.initPos.x) / 2;
@@ -72,15 +69,9 @@ public class CameraController : MonoBehaviour
                 transform.position.z
             );
 
-            Debug.Log("bird's pos = " + bird.transform.position);
-            Debug.Log("apoint's pos = " + aPoint.transform.position);
-            Debug.Log("desiredPosition = " + desiredPosition);
-
             Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, lerpFactor);
 
             transform.position = smoothedPosition;
-
-            Debug.Log("transform.pos1" + transform.position);
             
             // limit to where cam can move
             transform.position = new Vector3 (
@@ -88,15 +79,6 @@ public class CameraController : MonoBehaviour
                 Mathf.Clamp(transform.position.y, minY, maxY),
                 transform.position.z
             );
-
-            /*
-            Debug.Log("minX = " + minX);
-            Debug.Log("maxX = " + maxX);
-            Debug.Log("minY = " + minY);
-            Debug.Log("maxY = " + maxY);
-            */
-
-            Debug.Log("transform.pos2" + transform.position);
         }
     }
 
