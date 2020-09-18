@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 
-public class ParallaxBG2 : MonoBehaviour {
+public class ParallaxController : MonoBehaviour {
     // The bigger the factor, the slower the movement following the camera, vice versa
     // scaleFactor >> for BG
     // scaleFactor << for FG
-    CameraController cam;
+    private CameraController cam;
+    private Vector2 initPos, deltaPos;
+    private Vector3 camInit;
     private float scaleFactor;
-    Vector2 initPos, deltaPos;
-    Vector3 camInit;
+
+    public int index;
 
     private void Start() {
-        scaleFactor = FindObjectOfType<GlobalVar>().parallaxBG2;
+        scaleFactor = FindObjectOfType<ParallaxSettings>().parallaxes[index].scaleFactor;
+        Debug.Log("scaleFactor = " + scaleFactor);
         initPos = transform.position;
         deltaPos = Camera.main.transform.position - camInit;
     }
@@ -19,7 +22,7 @@ public class ParallaxBG2 : MonoBehaviour {
         if (camInit == null) {
             camInit = cam.camInit;
         }
-        
+
         transform.position = new Vector3 (
             initPos.x + (Camera.main.transform.position.x - deltaPos.x) / scaleFactor,
             initPos.y + (Camera.main.transform.position.y - deltaPos.y) / scaleFactor,

@@ -40,7 +40,7 @@ public class LevelController : MonoBehaviour
         }
         tmpName = levelName;
 
-    //===================================================================||  PLAY STATE
+        //===================================================================||  PLAY STATE
         if (playTrigger == true) {
             // debug
             if (tmp != bird.birdWasLaunched) {
@@ -86,9 +86,9 @@ public class LevelController : MonoBehaviour
             // trigger load function
             loadTrigger = true;
         }
-    //===================================================================||  END OF PLAY STATE
+        //===================================================================||  END OF PLAY STATE
 
-    //===================================================================||  LOAD STATE
+        //===================================================================||  LOAD STATE
         // load only once then reset the trigger back off
         if (loadTrigger == true) {
             StartCoroutine(Load());
@@ -96,9 +96,10 @@ public class LevelController : MonoBehaviour
             loadTrigger = false;
             StartCoroutine(loadTriggerReset());
         }
-    //===================================================================||  END OF LOAD STATE
+        //===================================================================||  END OF LOAD STATE
     }
 
+    //===================================================================||  THE LOAD FUNCTIONS
     IEnumerator Load() {
         // prepare for next level
         levelIndex++;
@@ -156,4 +157,5 @@ public class LevelController : MonoBehaviour
 
         loadTrigger = true;
     }
+    //===================================================================||  END OF THE LOAD FUNCTIONS
 }

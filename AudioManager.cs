@@ -4,18 +4,16 @@ using UnityEngine.Audio;
 
 public class AudioManager : MonoBehaviour {
     public Sound[] sounds;
-
     public static AudioManager instance;
 
     private void Awake() {
+        // only one instance at a time
         if (instance == null)
             instance = this;
         else {
             Destroy(gameObject);
             return;
         }
-
-        DontDestroyOnLoad(gameObject);
 
         foreach (Sound s in sounds) {
             s.source = gameObject.AddComponent<AudioSource>();
@@ -45,3 +43,16 @@ public class AudioManager : MonoBehaviour {
         s.source.Stop();
     }
 }
+
+//===================================================================||  THE CLASS
+[System.Serializable] public class Sound {
+    public string name;
+    public AudioClip clip;
+
+    [Range(0f, 1f)] public float volume;
+    [Range(0.1f, 3f)] public float pitch;
+    public bool loop;
+
+    [HideInInspector] public AudioSource source;
+}
+//===================================================================||  END OF THE CLASS

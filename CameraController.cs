@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
     public Vector2 camInit;
     public float lerpFactor = 0.125f;
 
-//===================================================================||  DEFINE CAM BOUNDARIES
+    //===================================================================||  DEFINE CAM BOUNDARIES
     private void Start() {
         // init
         boundary = GameObject.Find("boundary");
@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour
         minY = camInit.y + (bottomLim - bottomCam);
         maxY = camInit.y + (topLim - topCam);
     }
-//===================================================================||  END OF DEFINE CAM BOUNDARIES
+    //===================================================================||  END OF DEFINE CAM BOUNDARIES
 
     private void FixedUpdate() {
         // re-init on new level
