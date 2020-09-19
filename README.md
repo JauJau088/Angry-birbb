@@ -14,4 +14,4 @@ Will provide the link to the game when it's completed.
 This is just a for-fun project for personal training purposes.
 Author in no way going to publish the game to play for general audience.
 
-The scripts and assets are all made from scratch by the author.
+All scripts and most assets are all made from scratch by the author.
