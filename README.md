@@ -1,9 +1,9 @@
 ### Angry-birbb
 
-My own rendition of the popular Angry Bird mobile game.
+My own rendition of the popular Angry Birds mobile game.
 
 Made with Unity game engine. This repository only contains the scripts.
-Assets and other supporting files are not publicly published here.
+Assets and other supporting files are not publicly published.
 
 Will provide the link to the game when it's completed.
 
