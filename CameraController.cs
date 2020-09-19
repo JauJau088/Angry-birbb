@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -12,11 +13,44 @@ public class CameraController : MonoBehaviour
 
     public Vector2 camInit;
     public float lerpFactor = 0.125f;
-
-    //===================================================================||  DEFINE CAM BOUNDARIES
+    public bool trigger = false;
+    public string bound = "CamBoundary";
+    
     private void Start() {
+        StartCoroutine(CamBound("CamBoundary"));
+    }
+
+    private void FixedUpdate() {
+        if (trigger == true) {
+            StartCoroutine(CamBound(bound));
+        }
+
+        // only if not null, follow bird's and the reference point aPoint movements
+        if (bird != null && aPoint != null) {
+            // cam follow birb and smoothen its movement
+            Vector3 desiredPosition = new Vector3 (
+                bird.transform.position.x + (aPoint.transform.position.x - bird.transform.position.x) / 2,
+                bird.transform.position.y + (aPoint.transform.position.y - bird.transform.position.y) / 2,
+                transform.position.z
+            );
+
+            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, lerpFactor);
+
+            transform.position = smoothedPosition;
+            
+            // limit to where cam can move
+            transform.position = new Vector3 (
+                Mathf.Clamp(transform.position.x, minX, maxX),
+                Mathf.Clamp(transform.position.y, minY, maxY),
+                transform.position.z
+            );
+        }
+    }
+
+    //===================================================================||  CAM BOUNDARY FUNCTION
+    IEnumerator CamBound(string boundaryName) {
         // init
-        boundary = GameObject.Find("boundary");
+        boundary = GameObject.Find(boundaryName);
         bird = FindObjectOfType<Bird>();
         aPoint = FindObjectOfType<Apoint>();
 
@@ -46,49 +80,10 @@ public class CameraController : MonoBehaviour
         maxX = camInit.x + (rightLim - rightCam);
         minY = camInit.y + (bottomLim - bottomCam);
         maxY = camInit.y + (topLim - topCam);
+
+        trigger = false;
+
+        yield return null;
     }
-    //===================================================================||  END OF DEFINE CAM BOUNDARIES
-
-    private void FixedUpdate() {
-        // re-init on new level
-        // this is necessary to handle scene transition because the obj will be destroyed
-        if (bird == null) {
-            bird = FindObjectOfType<Bird>();
-        }
-
-        if (aPoint == null) {
-            aPoint = FindObjectOfType<Apoint>();
-        }
-
-        // only if not null, follow bird's movements and the reference point aPoint
-        if (bird != null && aPoint != null) {
-            // cam follow birb and smoothen its movement
-            Vector3 desiredPosition = new Vector3 (
-                bird.transform.position.x + (aPoint.transform.position.x - bird.transform.position.x) / 2,
-                bird.transform.position.y + (aPoint.transform.position.y - bird.transform.position.y) / 2,
-                transform.position.z
-            );
-
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, lerpFactor);
-
-            transform.position = smoothedPosition;
-            
-            // limit to where cam can move
-            transform.position = new Vector3 (
-                Mathf.Clamp(transform.position.x, minX, maxX),
-                Mathf.Clamp(transform.position.y, minY, maxY),
-                transform.position.z
-            );
-        }
-    }
-
-    // debugging: just a nice overview on the boundary 
-    private void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawLine(new Vector2(minX, maxY), new Vector2(maxX, maxY));
-        Gizmos.DrawLine(new Vector2(maxX, maxY), new Vector2(maxX, minY));
-        Gizmos.DrawLine(new Vector2(maxX, minY), new Vector2(minX, minY));
-        Gizmos.DrawLine(new Vector2(minX, minY), new Vector2(minX, maxY));
-    }
+    //===================================================================||  END OF CAM BOUNDARY FUNCTION
 }

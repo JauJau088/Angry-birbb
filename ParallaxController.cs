@@ -13,12 +13,14 @@ public class ParallaxController : MonoBehaviour {
 
     private void Start() {
         scaleFactor = FindObjectOfType<ParallaxSettings>().parallaxes[index].scaleFactor;
-        Debug.Log("scaleFactor = " + scaleFactor);
         initPos = transform.position;
         deltaPos = Camera.main.transform.position - camInit;
     }
 
     private void Update() {
+        // debug for testing scaleFactor's
+        //scaleFactor = FindObjectOfType<ParallaxSettings>().parallaxes[index].scaleFactor;
+
         if (camInit == null) {
             camInit = cam.camInit;
         }
