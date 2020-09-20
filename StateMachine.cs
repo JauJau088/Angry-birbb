@@ -125,25 +125,20 @@ public class StateMachine : MonoBehaviour
         enemies = FindObjectsOfType<Enemy>();
         levelBoundary = GameObject.Find("LevelBoundary");
 
-        // set cam for level transition
-        FindObjectOfType<CameraController>().lerpFactor = 0.03f;
-        FindObjectOfType<CameraController>().trigger = true;
-        FindObjectOfType<CameraController>().bound = "CamTransitionBoundary";
-
-        // level boundaries, to limit how far the bird can go
+        // re-init level boundaries, to limit how far the bird can go
         minX = levelBoundary.GetComponent<Renderer>().bounds.min.x;
         maxX = levelBoundary.GetComponent<Renderer>().bounds.max.x;
         minY = levelBoundary.GetComponent<Renderer>().bounds.min.y;
         maxY = levelBoundary.GetComponent<Renderer>().bounds.max.y;
 
-        // wait for few sec before restarting the Play state
-        yield return new WaitForSeconds(3f);
+        // set cam for level transition
+        FindObjectOfType<CameraController>().triggerTransition = true;
+
+        yield return new WaitForSeconds(6f);
 
         // TRIGGER PLAY STATE
         // reset cam for play state
-        FindObjectOfType<CameraController>().lerpFactor = 0.125f;
-        FindObjectOfType<CameraController>().bound = "CamBoundary";
-        FindObjectOfType<CameraController>().trigger = true;
+        FindObjectOfType<CameraController>().triggerPlay = true;
 
         // start Play state
         Debug.Log("---------------------------- START PLAY ----------------------------");

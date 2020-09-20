@@ -12,18 +12,45 @@ public class CameraController : MonoBehaviour
     private float minX, maxX, minY, maxY;
 
     public Vector2 camInit;
-    public float lerpFactor = 0.125f;
-    public bool trigger = false;
+    public float lerpFactor, lerpTemp, lerpPlay = 0.125f, lerpTransition = 0.001f;
+    public bool triggerTransition = false, triggerPlay = false, stop = false;
     public string bound = "CamBoundary";
     
     private void Start() {
         StartCoroutine(CamBound("CamBoundary"));
+        lerpFactor = lerpPlay;
+        lerpTemp = lerpTransition;
     }
 
     private void FixedUpdate() {
-        if (trigger == true) {
+        //===================================================================||  TRIGGERS CONNECTED TO STATE MACHINE
+        if (triggerTransition == true) {
+            bound = "CamTransitionBoundary";
             StartCoroutine(CamBound(bound));
+            StartCoroutine("CamTransition");
+
+            // turn trigger off
+            triggerTransition = false;
         }
+
+        if (triggerPlay == true) {
+            // stop transition coroutine if any & reset lerp values to original
+            StopCoroutine("CamTransition");
+            Debug.Log("final lerp = " + lerpTemp);
+            lerpFactor = lerpPlay;
+            lerpTemp = lerpTransition;
+
+            // re-init cam bound
+            bound = "CamBoundary";
+            StartCoroutine(CamBound(bound));
+
+            // turn trigger off
+            triggerPlay = false;
+
+            return;
+        }
+        //===================================================================||  END OF TRIGGERS CONNECTED TO STATE MACHINE
+
 
         // only if not null, follow bird's and the reference point aPoint movements
         if (bird != null && aPoint != null) {
@@ -81,9 +108,21 @@ public class CameraController : MonoBehaviour
         minY = camInit.y + (bottomLim - bottomCam);
         maxY = camInit.y + (topLim - topCam);
 
-        trigger = false;
-
         yield return null;
     }
     //===================================================================||  END OF CAM BOUNDARY FUNCTION
+
+    IEnumerator CamTransition() {
+        // wait for few sec before restarting the Play state
+        while (lerpTemp < lerpPlay) {
+            lerpTemp = lerpTemp + 0.0001f;
+            lerpFactor = lerpTemp;
+
+            yield return null;
+        }
+
+        // if finished, reset lerp values to original
+        lerpFactor = lerpPlay;
+        lerpTemp = lerpTransition;
+    }
 }
