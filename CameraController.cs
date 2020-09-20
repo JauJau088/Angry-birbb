@@ -7,38 +7,38 @@ public class CameraController : MonoBehaviour
     private Bird bird;
     private Apoint aPoint;
 
+    private Vector3 desiredPosition, smoothedPosition, velocity = Vector3.zero;
     private float leftLim, rightLim, bottomLim, topLim;
     private float leftCam, rightCam, bottomCam, topCam, camHeight, camWidth;
     private float minX, maxX, minY, maxY;
+    private float dampTime, dampPlay = 0.2f, dampTransition = 2f;
+    private string bound = "CamBoundary";
 
     public Vector2 camInit;
-    public float lerpFactor, lerpTemp, lerpPlay = 0.125f, lerpTransition = 0.001f;
-    public bool triggerTransition = false, triggerPlay = false, stop = false;
-    public string bound = "CamBoundary";
+    public bool triggerTransition = false, triggerPlay = false;
     
     private void Start() {
+        dampTime = dampPlay;
         StartCoroutine(CamBound("CamBoundary"));
-        lerpFactor = lerpPlay;
-        lerpTemp = lerpTransition;
     }
 
     private void FixedUpdate() {
         //===================================================================||  TRIGGERS CONNECTED TO STATE MACHINE
         if (triggerTransition == true) {
+            dampTime = dampTransition;
+
+            // re-init cam bound
             bound = "CamTransitionBoundary";
             StartCoroutine(CamBound(bound));
-            StartCoroutine("CamTransition");
 
             // turn trigger off
             triggerTransition = false;
+
+            return;
         }
 
         if (triggerPlay == true) {
-            // stop transition coroutine if any & reset lerp values to original
-            StopCoroutine("CamTransition");
-            Debug.Log("final lerp = " + lerpTemp);
-            lerpFactor = lerpPlay;
-            lerpTemp = lerpTransition;
+            dampTime = dampPlay;
 
             // re-init cam bound
             bound = "CamBoundary";
@@ -51,17 +51,17 @@ public class CameraController : MonoBehaviour
         }
         //===================================================================||  END OF TRIGGERS CONNECTED TO STATE MACHINE
 
-
+        //===================================================================||  CAMERA FOLLOW
         // only if not null, follow bird's and the reference point aPoint movements
         if (bird != null && aPoint != null) {
             // cam follow birb and smoothen its movement
-            Vector3 desiredPosition = new Vector3 (
+            desiredPosition = new Vector3 (
                 bird.transform.position.x + (aPoint.transform.position.x - bird.transform.position.x) / 2,
                 bird.transform.position.y + (aPoint.transform.position.y - bird.transform.position.y) / 2,
                 transform.position.z
             );
 
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, lerpFactor);
+            smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, dampTime);
 
             transform.position = smoothedPosition;
             
@@ -72,6 +72,7 @@ public class CameraController : MonoBehaviour
                 transform.position.z
             );
         }
+        //===================================================================||  END OF CAMERA FOLLOW
     }
 
     //===================================================================||  CAM BOUNDARY FUNCTION
@@ -111,18 +112,4 @@ public class CameraController : MonoBehaviour
         yield return null;
     }
     //===================================================================||  END OF CAM BOUNDARY FUNCTION
-
-    IEnumerator CamTransition() {
-        // wait for few sec before restarting the Play state
-        while (lerpTemp < lerpPlay) {
-            lerpTemp = lerpTemp + 0.0001f;
-            lerpFactor = lerpTemp;
-
-            yield return null;
-        }
-
-        // if finished, reset lerp values to original
-        lerpFactor = lerpPlay;
-        lerpTemp = lerpTransition;
-    }
 }

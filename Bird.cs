@@ -69,14 +69,14 @@ public class Bird : MonoBehaviour
     [SerializeField] private float radius = (float)0.5;
 
     private void OnMouseDrag() {
-        // debug start
+        /*// debug start
             Vector3 n = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             // smoother first
             Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
             // move position
             transform.position = smoothedPosition;
-        // debug end
-        /*
+        // debug end*/
+        
         if (birdWasLaunched == false) {
             ////////////
             Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -115,7 +115,7 @@ public class Bird : MonoBehaviour
             Vector3 smoothedPosition = Vector2.Lerp(transform.position, n, 0.125f);
             // move position
             transform.position = smoothedPosition;
-        }*/
+        }
     }
 
     private void OnMouseUp() {
