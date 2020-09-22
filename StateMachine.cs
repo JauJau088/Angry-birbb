@@ -41,6 +41,16 @@ public class StateMachine : MonoBehaviour
 
         //===================================================================||  PLAY STATE
         if (playTrigger == true) {
+            // debug: go to next level
+            if (Input.GetKeyDown("space")) {
+                // STOP PLAY STATE
+                Debug.Log("---------------------------- QUIT PLAY ----------------------------");
+                playTrigger = false;
+
+                // TRIGGER LOAD FUNCTION
+                StartCoroutine(Load());
+            }
+
             // if bird was launched and move very slowly, start timer
             if (bird.birdWasLaunched && (bird.GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1)) {
                 waitTime += Time.deltaTime;
