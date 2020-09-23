@@ -2,15 +2,22 @@
 
 public class Bird : MonoBehaviour
 {
-    public Vector3 initPos;
-    public bool birdWasLaunched = false;
-    private bool doThisOnce = true, doThisOnce2 = true, collided = false;
-    private float timer = 0;
     [SerializeField] private int launchPower = 2300;
     [SerializeField] private float gravity = (float)0.14;
+    private bool doThisOnce = true, doThisOnce2 = true, collided = false;
+    private float timer = 0;
+    private AudioManager audio;
+    private string[] sound = {"RubberStretch", "RubberRelease", "MagicSprinkle", "BirdFly"};
+
+    public Vector3 initPos;
+    public bool birdWasLaunched = false;
 
     private void Awake() {
         initPos = transform.position;
+    }
+
+    private void Start() {
+        audio = FindObjectOfType<AudioManager>();
     }
 
     private void Update() {
@@ -22,7 +29,7 @@ public class Bird : MonoBehaviour
         if (birdWasLaunched && doThisOnce) {
             timer += Time.deltaTime;
             if (timer >= 0.3f) {
-                FindObjectOfType<AudioManager>().Play("MagicSprinkle");
+                audio.Play(sound[2]);
 
                 doThisOnce = false;
                 timer = 0;
@@ -33,7 +40,7 @@ public class Bird : MonoBehaviour
         if (birdWasLaunched && doThisOnce2) {
             timer += Time.deltaTime;
             if (timer >= 0.2f) {
-                FindObjectOfType<AudioManager>().Play("BirdFly");
+                audio.Play(sound[3]);
 
                 doThisOnce2 = false;
                 timer = 0;
@@ -55,13 +62,13 @@ public class Bird : MonoBehaviour
     private void OnMouseDown() {
         if (birdWasLaunched == false) {
             // overlay the sprite color
-            GetComponent<SpriteRenderer>().color = Color.red;
+            //GetComponent<SpriteRenderer>().color = Color.red;
 
             // show LineRenderer
             GetComponent<LineRenderer>().enabled = true;
 
             // play SFX
-            FindObjectOfType<AudioManager>().Play("RubberStretch");
+            audio.Play(sound[0]);
         }
     }
     
@@ -140,10 +147,10 @@ public class Bird : MonoBehaviour
             collided = false;
 
             // turn off SFX
-            FindObjectOfType<AudioManager>().Stop("RubberStretch");
+            audio.Stop(sound[0]);
 
             // play SFX
-            FindObjectOfType<AudioManager>().Play("RubberRelease");
+            audio.Play(sound[1]);
 
             /*
             int rand = Random.Range(0,3);

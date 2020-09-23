@@ -3,6 +3,13 @@
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private GameObject cloudParticlePrefab;
+    private AudioManager audio;
+    private string[] sound = {"Scream1", "Scream2", "Scream3", "Scream4"};
+    private int i;
+
+    private void Start() {
+        audio = FindObjectOfType<AudioManager>();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.collider.GetComponent<Bird>() != null) {
@@ -30,6 +37,14 @@ public class Enemy : MonoBehaviour
         if (Vector3.Dot(transform.up, Vector3.down) > 0) {
             Instantiate(cloudParticlePrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy() {
+        i = Random.Range(0,4);
+
+        if (audio != null) {
+            audio.Play(sound[i]);
         }
     }
 }
